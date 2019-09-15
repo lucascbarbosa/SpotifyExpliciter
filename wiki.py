@@ -58,10 +58,6 @@ for year in range(start,end+1):
             for i, e in enumerate(entry.find_all('td')):
                 if i == 0:
                     row['date'] = e.text+" "+str(year)
-                    if year == 2011: # Fixes date oddity in 2011 data
-                        month = (month_re.search(e.text)).group()
-                        day = (day_re.search(e.text)).group()
-                        row['date'] = month+" "+day+" "+str(year)
                 elif i == 1:
                     row['title'] = e.text
                     if 'rowspan' in e.attrs:
@@ -115,23 +111,12 @@ for e in res:
     prev_artist = e['artists']
     res_updated.append(row)
 
-# Clean year end transitions
-res_updated2 = []
-for i in range(0,len(res_updated)):
-    if "December" in res_updated[i]['date'] and "January" in res_updated[i+1]['date'] \
-        and res_updated[i]['title'] == res_updated[i+1]['title']:
-        row = res_updated[i]
-        row['weeks'] = res_updated[i]['weeks'] + res_updated[i+1]['weeks']
-        res_updated2.append(row)
-    elif "December" in res_updated[i-1]['date'] and "January" in res_updated[i]['date'] \
-        and res_updated[i-1]['title'] == res_updated[i]['title']:
-        continue
-    else:
-        res_updated2.append(res_updated[i])
+
+
 
 # Consolidate titles
 res_by_title = defaultdict(dict)
-for e in res_updated2:
+for e in res_updated:
     row = {}
     row['artists'] = e['artists']
     row['title'] = e['title']
